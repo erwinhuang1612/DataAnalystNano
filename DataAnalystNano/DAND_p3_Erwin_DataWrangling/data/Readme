@@ -1,4 +1,4 @@
 Datasources:
--singapore.osm: original dataset
--singapore.osm.json: transformed and cleaned dataset
+-singapore.osm(http://bit.ly/singaporeOSMorigin): original dataset
+-singapore.osm.json (http://bit.ly/singaporeOSMjson): transformed and cleaned dataset
 -smallSingapore.osm: sample dataset
