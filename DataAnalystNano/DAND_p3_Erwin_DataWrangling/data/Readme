@@ -1,0 +1,4 @@
+Datasources:
+-singapore.osm: original dataset
+-singapore.osm.json: transformed and cleaned dataset
+-smallSingapore.osm: sample dataset
