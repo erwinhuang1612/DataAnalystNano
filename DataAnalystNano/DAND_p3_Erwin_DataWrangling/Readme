@@ -1,0 +1,3 @@
+The purpose of this project is to audit, analyze and clean Singapore OpenStreetMap (OSM) XML. After the data is cleaned, it will be transformed into a JSON format to be uploaded into a MongoDB Database.
+OpenStreetMap view of Singapore: https://www.openstreetmap.org/relation/536780
+About Singapore: https://en.wikipedia.org/wiki/Singapore
