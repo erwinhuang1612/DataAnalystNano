@@ -92,7 +92,7 @@ print('\n--- %s seconds ---' % (time.time() - start_time))
      ('bounds', 1),
      ('osm', 1)]
     
-    --- 17.0199999809 seconds ---
+    --- 28.503000021 seconds ---
     
 
 The most striking finding is that there are two elements that appear only once:
@@ -156,7 +156,7 @@ print('\n--- %s seconds ---' % (time.time() - start_time))
      ('maxlat', 1),
      ('minlon', 1)]
     
-    --- 27.3550000191 seconds ---
+    --- 27.506000042 seconds ---
     
 
 The important attributes here are 'k' and 'v' because they contain the information of `<tag>` describing the 3 'building-block' elements (node, way, relation) that were mentioned above.
@@ -194,7 +194,7 @@ keys = count_keys(OSMFILE)
 sorted_by_occurrence = [(key,keys[key]) for key in sorted(keys, key=keys.get, reverse=True) ]
 
 print 'Keys and occurrence in Singapore.osm:\n'
-pprint.pprint(sorted_by_occurrence[:100])
+pprint.pprint(sorted_by_occurrence[:20])
 
 print('\n--- %s seconds ---' % (time.time() - start_time))
 ```
@@ -220,89 +220,9 @@ print('\n--- %s seconds ---' % (time.time() - start_time))
      ('asset_ref', 4954),
      ('route_ref', 4906),
      ('surface', 4801),
-     ('building:levels', 4475),
-     ('landuse', 3999),
-     ('access', 3624),
-     ('ref', 3465),
-     ('leisure', 3428),
-     ('layer', 3422),
-     ('natural', 3083),
-     ('lanes', 2996),
-     ('foot', 2888),
-     ('bridge', 2746),
-     ('type', 2353),
-     ('bicycle', 2293),
-     ('power', 2027),
-     ('maxspeed', 1994),
-     ('shop', 1920),
-     ('residential', 1629),
-     ('waterway', 1486),
-     ('sport', 1421),
-     ('man_made', 1369),
-     ('building:part', 1332),
-     ('website', 1296),
-     ('barrier', 1259),
-     ('name:en', 1169),
-     ('place', 1159),
-     ('tourism', 1117),
-     ('railway', 1049),
-     ('parking', 1042),
-     ('name:zh', 1030),
-     ('seamark:type', 953),
-     ('cuisine', 896),
-     ('religion', 885),
-     ('note', 876),
-     ('phone', 874),
-     ('horse', 857),
-     ('motorcar', 848),
-     ('operator', 789),
-     ('hgv', 769),
-     ('goods', 757),
-     ('addr:housename', 748),
-     ('tunnel', 727),
-     ('lit', 721),
-     ('psv', 714),
-     ('height', 708),
-     ('emergency', 705),
-     ('route', 680),
-     ('taxi', 680),
-     ('garmin_road_class', 674),
-     ('building:use', 654),
-     ('golf', 640),
-     ('aeroway', 617),
-     ('building:colour', 598),
-     ('covered', 573),
-     ('motor_vehicle', 553),
-     ('network', 551),
-     ('public_transport:version', 543),
-     ('sidewalk', 542),
-     ('from', 540),
-     ('to', 540),
-     ('direction', 533),
-     ('alt_name', 509),
-     ('name:ms', 506),
-     ('roof:colour', 474),
-     ('water', 471),
-     ('wheelchair', 462),
-     ('opening_hours', 453),
-     ('level', 450),
-     ('building:material', 448),
-     ('fixme', 422),
-     ('building:min_level', 406),
-     ('crossing', 371),
-     ('width', 369),
-     ('public_transport', 366),
-     ('seamark:name', 362),
-     ('area', 354),
-     ('is_in:country', 350),
-     ('school', 339),
-     ('restriction', 337),
-     ('roof:shape', 337),
-     ('wikipedia', 325),
-     ('is_in:state', 316),
-     ('seamark:light:character', 316)]
+     ('building:levels', 4475)]
     
-    --- 23.3770000935 seconds ---
+    --- 25.8220000267 seconds ---
     
 
 From the results above, we can see that there are mainly 5 formats of the 'k' attribute:
@@ -372,7 +292,7 @@ print('\n--- %s seconds ---' % (time.time() - start_time))
      ('lower_two_colon', 3079),
      ('problemchars', 4)]
     
-    --- 27.0119998455 seconds ---
+    --- 26.8359999657 seconds ---
     
 
 From the result above, we can see that there is still around 1.6% of the datasets in the 'other' and 'problemchars' category. This may signify some invalid format that needs to be corrected.
@@ -381,34 +301,34 @@ As such, we will print out each of the dictionary key-value pair to check if the
 
 
 ```python
-print(keys['lower'][:100])
+print(keys['lower'][:10])
 ```
 
-    ['ref', 'highway', 'created_by', 'created_by', 'ref', 'highway', 'ref', 'highway', 'ref', 'name', 'highway', 'created_by', 'highway', 'highway', 'highway', 'highway', 'highway', 'highway', 'highway', 'highway', 'ref', 'highway', 'highway', 'highway', 'highway', 'highway', 'highway', 'highway', 'highway', 'highway', 'highway', 'highway', 'highway', 'ref', 'name', 'exit_to', 'highway', 'ref', 'name', 'exit_to', 'highway', 'ref', 'name', 'exit_to', 'highway', 'ref', 'name', 'exit_to', 'highway', 'ref', 'name', 'exit_to', 'highway', 'ref', 'name', 'exit_to', 'highway', 'ref', 'name', 'exit_to', 'highway', 'ref', 'name', 'exit_to', 'highway', 'ref', 'name', 'exit_to', 'highway', 'ref', 'name', 'exit_to', 'highway', 'ref', 'name', 'exit_to', 'highway', 'ref', 'exit_to', 'highway', 'ref', 'name', 'exit_to', 'highway', 'created_by', 'ref', 'name', 'exit_to', 'highway', 'ref', 'name', 'exit_to', 'highway', 'created_by', 'ref', 'name', 'exit_to', 'highway', 'ref', 'name']
+    ['ref', 'highway', 'created_by', 'created_by', 'ref', 'highway', 'ref', 'highway', 'ref', 'name']
     
 
 
 ```python
-print(keys['lower_colon'][:100])
+print(keys['lower_colon'][:10])
 ```
 
-    ['name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:hi', 'name:ms', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:hi', 'name:ms', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:hi', 'name:ms', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:hi', 'name:ms', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:hi', 'name:ms', 'name:zh', 'name:ar', 'name:en', 'name:zh', 'name:en']
+    ['name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh', 'name:en', 'name:zh']
     
 
 
 ```python
-print(keys['lower_two_colon'][:100])
+print(keys['lower_two_colon'][:10])
 ```
 
-    ['seamark:light:range', 'seamark:light:colour', 'seamark:light:height', 'seamark:light:period', 'seamark:landmark:height', 'seamark:light:character', 'seamark:light:reference', 'seamark:radar_transponder:group', 'seamark:radar_transponder:category', 'seamark:light:group', 'seamark:light:range', 'seamark:light:colour', 'seamark:light:height', 'seamark:light:period', 'seamark:light:sequence', 'seamark:landmark:height', 'seamark:light:character', 'seamark:light:reference', 'seamark:light:group', 'seamark:light:range', 'seamark:light:colour', 'seamark:light:height', 'seamark:light:period', 'seamark:light:character', 'seamark:light:reference', 'seamark:light:range', 'seamark:light:colour', 'seamark:light:height', 'seamark:light:period', 'seamark:light:sequence', 'seamark:landmark:height', 'seamark:light:character', 'seamark:light:reference', 'seamark:radar_transponder:group', 'seamark:radar_transponder:category', 'seamark:light:range', 'seamark:light:colour', 'seamark:light:height', 'seamark:light:period', 'seamark:light:character', 'seamark:light:reference', 'seamark:light:range', 'seamark:light:colour', 'seamark:light:height', 'seamark:light:period', 'seamark:light:category', 'seamark:light:character', 'seamark:light:reference', 'seamark:light:range', 'seamark:light:colour', 'seamark:light:height', 'seamark:light:period', 'seamark:light:character', 'seamark:light:reference', 'seamark:light:colour', 'seamark:light:character', 'seamark:light:reference', 'seamark:light:colour', 'seamark:light:character', 'seamark:light:reference', 'seamark:light:range', 'seamark:light:colour', 'seamark:light:height', 'seamark:light:period', 'seamark:light:character', 'seamark:light:reference', 'seamark:light:reference', 'seamark:light:range', 'seamark:light:colour', 'seamark:light:height', 'seamark:light:period', 'seamark:topmark:shape', 'seamark:topmark:colour', 'seamark:light:character', 'seamark:light:reference', 'seamark:beacon_lateral:colour', 'seamark:beacon_lateral:height', 'seamark:beacon_lateral:system', 'seamark:beacon_lateral:category', 'seamark:light:group', 'seamark:light:range', 'seamark:light:colour', 'seamark:light:height', 'seamark:light:period', 'seamark:topmark:shape', 'seamark:light:character', 'seamark:beacon_lateral:colour', 'seamark:beacon_lateral:height', 'seamark:beacon_lateral:system', 'seamark:beacon_lateral:category', 'seamark:light:reference', 'seamark:beacon_lateral:shape', 'seamark:beacon_lateral:colour', 'seamark:beacon_lateral:system', 'seamark:beacon_lateral:category', 'seamark:light:group', 'seamark:light:range', 'seamark:light:height', 'seamark:light:period', 'seamark:topmark:shape']
+    ['seamark:light:range', 'seamark:light:colour', 'seamark:light:height', 'seamark:light:period', 'seamark:landmark:height', 'seamark:light:character', 'seamark:light:reference', 'seamark:radar_transponder:group', 'seamark:radar_transponder:category', 'seamark:light:group']
     
 
 
 ```python
-print(keys['other'][:100])
+print(keys['other'][:10])
 ```
 
-    ['naptan:Bearing', 'name:zh-yue', 'name:bat-smg', 'name:fiu-vro', 'name:map-bms', 'name:roa-rup', 'name:roa-tara', 'name:be-tarask', 'name:zh-min-nan', 'name:zh-classical', 'country_code_iso3166_1_alpha_2', 'name:zh-yue', 'name:bat-smg', 'name:map-bms', 'name:roa-rup', 'name:roa-tara', 'name:be-tarask', 'name:zh-min-nan', 'W111', 'W112', 'W113', 'W114', 'W115', 'W125A', 'W125B', 'W5A15', 'W5A18', 'W5A19', 'W5A21', 'W5A13B', 'W5A210', 'W5A211', 'W5A21C', 'W5A11K-M', 'W312', 'W314', 'W317', 'W318', 'W319', 'W3111', 'W315A', 'W315B', 'W3110C', 'W3110E', 'W3110F', 'W3112A', 'W3110_A', 'W3110A_B', 'T16213', 'T16214', 'W1201', 'W1212', 'W1213', 'W1218', 'SMA', 'T1A', 'W1114', 'W1121', 'W1122', 'W1111A', 'W1111B', 'W1112A', 'T2231', 'T2232', 'T2233', 'T2234', 'T2251', 'T2232A', 'T22430', 'T22515', 'T22617', 'W212', 'W213', 'W214', 'W215', 'W216', 'W217', 'W221', 'W211A', 'W211B', 'W211D', 'W1001', 'W1011', 'T15', 'T11A101', 'T11A201', 'T11A202', 'T11A203', 'T11A303', 'T11A311', 'T11A314', 'T11A317', 'T11A401', 'T11A402', 'T11A405', 'T11A408', 'T11A410', 'T11A411', 'T11A412', 'T11A413']
+    ['naptan:Bearing', 'name:zh-yue', 'name:bat-smg', 'name:fiu-vro', 'name:map-bms', 'name:roa-rup', 'name:roa-tara', 'name:be-tarask', 'name:zh-min-nan', 'name:zh-classical']
     
 
 
