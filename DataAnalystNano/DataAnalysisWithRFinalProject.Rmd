@@ -1,0 +1,538 @@
+---
+title: "Data_Analysis_With_R_Final_Project"
+author: "Erwin"
+date: "18 March 2017"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+### install.packages('knitr')
+knitr::opts_chunk$set(error = TRUE, echo =TRUE)
+```
+
+
+```{r, echo=FALSE, message = FALSE, warning=FALSE}
+# save.image("myWorkSpace.RData")
+# load("myWorkSpace.RData")
+### Load Required Libraries
+# options(repos="https://cran.rstudio.com" )
+# install.packages('ggplot2')
+# install.packages('lubridate')
+# install.packages('RColorBrewer')
+# 
+# install.packages('corrplot')
+# install.packages('data.table')
+# install.packages('plyr')
+# install.packages('dplyr')
+library(ggplot2)
+library(RColorBrewer)
+library(data.table)
+library(corrplot)
+library(lubridate)
+library(plyr)
+library(dplyr)
+require(ggplot2)
+
+```
+
+## First look at Prosper Loan Data Set
+```{r}
+##load the loan data to dataframe
+loan_full <- read.csv(file='data/prosperLoanData.csv')
+
+##take a look at the list of variables. 81 variables in total
+names(loan_full)
+```
+
+With so many variables in the datasets, I need to first understand the meaning of the variables based on the given [variable definitions.](http://bit.ly/ProsperLoanDataDAND)
+
+Because it is a loan data, some of the initial thoughts I have is to analyze on variables related to income, profession / employment, loan amount, credit info of the borrower.
+
+As such, I have shortlisted 19 variables for the analysis in this project:
+EmploymentStatusDuration, CreditScoreRangeUpper, ListingCategory, CreditScoreRangeLower, CurrentCreditLines, DebtToIncomeRatio, StatedMonthlyIncome, Occupation, BorrowerState, EmploymentStatus, IsBorrowerHomeowner, IncomeRange, IncomeVerifiable, BorrowerAPR, BorrowerRate, Term, LoanStatus, LoanOriginalAmount, LoanOriginationDate, MonthlyLoanPayment
+
+```{r}
+## Create a subset of the full dataset with preselected variables that will be analyzed
+loan <- select(loan_full, 
+            EmploymentStatusDuration, ListingCategory..numeric., CreditScoreRangeLower,
+            CurrentCreditLines, DebtToIncomeRatio,
+            StatedMonthlyIncome, Occupation,
+            BorrowerState, EmploymentStatus,
+            IsBorrowerHomeowner, IncomeRange,
+            IncomeVerifiable, BorrowerAPR,
+            BorrowerRate, Term,
+            LoanStatus, LoanOriginalAmount,
+            LoanOriginationDate, MonthlyLoanPayment,
+            ProsperRating..Alpha.,ProsperRating..numeric.)
+            
+loan$Term <- factor(loan$Term)
+
+
+summary(loan)
+str(loan)
+names(loan)
+```
+There is a good mix of both discrete and continuous variables, which can be further explored in the univariate plot section below.
+
+# Univariate Plots
+This section analyzes the distribution and characteristics of single variables that were selected above.
+
+Here are some custom functions to help summarize the information  of variables that will be used later.
+```{r, Custom Functions, echo=FALSE, message = FALSE, warning=FALSE}
+#To show both frequency and percentage of a variable
+multi.fun <- function(x) {
+  cbind(freq = table(x), percentage = prop.table(table(x))*100)
+}
+
+#To sort a variable in a descending order
+reorder_size <- function(x) {
+  factor(x, levels = names(sort(table(x),decreasing = TRUE)))
+}
+
+```
+
+First thing that comes to my mind when we talk about loan is income. So, let's first look at the stated monthly income of users.
+```{r, Stated Monthly Income, echo=FALSE, message=FALSE , warning=FALSE}
+ggplot(aes(x=StatedMonthlyIncome), data=loan) + 
+    geom_histogram(fill='#05DBF2', color='black') +
+    labs(title=expression(paste("Stated Monthly Income")), 
+         x='Stated Monthly Income')
+
+summary(loan$StatedMonthlyIncome)
+
+ggplot(aes(x=StatedMonthlyIncome), data=loan) + 
+    geom_histogram(fill='#05DBF2', 
+                   color='black', 
+                   binwidth=500) +
+    scale_x_continuous(breaks=seq(0,20000,2000),limits=c(0,20000)) +
+    labs(title="Stated Monthly Income",
+         x='Stated Monthly Income')
+```
+Because the stated monthly income is extremely skewed in the positive side (max income = 1750000), we need to limit the x-axis to display a more observable histogram distribution. After limiting the x-axis to 20000, We can see that the common range of stated monthly income falls between 3000 to 6000, which is in line with the IQR distribution shown.
+
+Next, we will analyze the annual income range of users.
+
+```{r, Income Range, echo=FALSE, message=FALSE , warning=FALSE}
+multi.fun(loan$IncomeRange)
+
+IncomeRange <- factor(loan$IncomeRange,
+    levels = c(1,4,3,2),ordered = TRUE)
+
+loan$IncomeRange_reordered <- factor(loan$IncomeRange, levels(loan$IncomeRange)[c(1,2,4,5,6,3,7,8)])
+
+ggplot(data=loan, aes(x= IncomeRange_reordered)) +
+  geom_bar(fill='#05DBF2', 
+           color='black') +
+  geom_text(stat='count',size= 3, aes(label=..count..),vjust=-0.5)+
+  labs(title = "Annual Income Range",
+       x= "Annual Income Range") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) 
+```
+The annual income range tallies with the stated monthly income. In this case, 55% of the users are in the income range of \$25K to \$75K. Most of the users (>90%) have stated their income range, except for the category of $0, "Not displayed", "Not employed".
+
+
+Next, we are going to analyze the loan amount by annual income range.
+```{r,  Income Range vs Loan Original Amount, echo=FALSE, message=FALSE , warning=FALSE }
+ggplot(data=loan, aes(x=IncomeRange_reordered,y=LoanOriginalAmount, color=IncomeRange_reordered))+
+  geom_boxplot() +
+  labs(title = "Annual Income Range by Loan Original Amount",
+       x= "Annual Income Range", y = "Loan Original Amount") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+```
+From the boxplot above, we can observe that users with higher income tend to take a higher loan amount.
+
+After getting some ideas about the income range of users, we may be interested to know whether the stated income range is already verified or not.
+```{r, Income Verifiable, echo=FALSE, message=FALSE , warning=FALSE}
+multi.fun(loan$IncomeVerifiable)
+
+ggplot(data=loan, aes(x= IncomeVerifiable)) +
+  geom_bar(fill='#05DBF2', 
+           color='black') +
+  geom_text(stat='count',size= 3, aes(label=..count..),vjust=-0.5)+
+  labs(title = "Income Verifiable",
+       x= "Income Verifiable") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) 
+```
+Fortunately, most of the users (>90%) have their income verified in the Prosper platform.
+
+After understanding the distribution of income-related variables, we will move on to analyze the occupation of users.
+
+```{r,occupation, echo=false, warning=TRUE, message=TRUE}
+
+str(loan$Occupation)
+multi.fun(reorder_size(loan$Occupation))
+
+setDT(loan) #set data table for loan dataframe, so that we can do subsetting and top N occupations
+
+setkey(x=loan, Occupation) #set key of data table to improve performance
+occupationFrequency <- loan[, list(count = .N), 
+                            by=Occupation] #create a frequency count for each category of occupation 
+
+occupationSubset <- subset(occupationFrequency,!(Occupation %in% c('Other',''))) #remove 'Other' category from Occupation
+
+topTenOccupation <- occupationSubset[order(count, decreasing = TRUE)][1:10] #reorder and subset top 10 occupations
+
+ggplot(data=loan[J(topTenOccupation)], aes(x= reorder_size(Occupation))) +
+  geom_bar(fill='#05DBF2', 
+           color='black') +
+  geom_text(stat='count',size= 3, aes(label=..count..),vjust=-0.5)+
+  labs(title = "Occupation",
+       x= "Occupation") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+There are many categories (68) in occupation. As such, to visualize it in a bar chart, we will need to:
+- First, subset the occupation data to exclude 'Other' and '<blank>'
+- Get the top 10 occupation from the subset of occupation for a more accurate reflection of top occupations.
+
+Afterwards, we are able to visually comprehend the distribution of occupations among users.
+
+From the summary table and the bar chart, we can observe that:
+- At least a quarter  of the users do not wish to indicate their occupation. This is shown by occupation of 'Other' (>25%) and '<blank>' (>3%)
+- The next top occupation (>11%) is 'Professional'. This is a very broad categorization of occupation, which may suggest that some users do not want to specifically indicate their occupation.
+- Combining both of the observations above, we can understand that around 40% of users have not stated their occupation specifically in the Prosper platform.
+- Interestingly, 'Computer Programmer' comes in 3rd. This occurence is probably because Prosper is an advanced fintech platform that many programmers are interested to try.
+
+Next, we will analyze Loan Original Amount variable.
+```{r, LoanOriginalAmount, echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(aes(x=LoanOriginalAmount), data=loan) + 
+    geom_histogram(fill='#05DBF2', 
+                   color='black', 
+                   binwidth=500) +
+    scale_x_continuous(breaks=seq(0,27000,2500),limits=c(0,27000)) +
+    labs(title="Loan Original Amount",
+         x='Loan Original Amount')
+```
+
+From the histogram above, We can see that there are some prominent peaks for original amount of loan at 4000, 10000, 15000. Some minor peaks include 2000, 3000, 5000. Interestingly, for higher amount of loan, 20000 and 25000 are the most common ones.
+
+
+Next, we will look at loan term variable.
+```{r,  loan term, echo=FALSE, message=FALSE , warning=FALSE}
+loan$Term_Factor <- factor(loan$Term) #convert to factor because there are only three categories of loan term, i.e. 12, 36, 60
+
+multi.fun(loan$Term_Factor)
+ggplot(data=loan, aes(x= reorder_size(Term_Factor))) +
+  geom_bar(fill='#05DBF2', 
+           color='black') +
+  geom_text(stat='count',size= 3, aes(label=..count..),vjust=-0.5)+
+  labs(title = "Loan Term (Months)",
+       x= "Loan Term (Months)") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+77% of the users have a loan term of 36 months (3 years), followed by 60 months and 12 months.
+
+```{r,  loan status, echo=FALSE, message=FALSE , warning=FALSE}
+multi.fun(loan$LoanStatus)
+ggplot(data=loan, aes(x= reorder_size(LoanStatus))) +
+  geom_bar(fill='#05DBF2', 
+           color='black') +
+  geom_text(stat='count',size= 3, aes(label=..count..),vjust=-0.5)+
+  labs(title = "Loan Status",
+       x= "Loan Status") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+Fortunately, around 82% of the users have "Current" or "Completed" loan status. These two statuses can be considered as positive categories of loan status because they mean that the users have either completed their loan payment or on track in making their loan payment.
+
+On the flip side, around 15% of the users have "Chargedoff" or "Defaulted" status. These two statuses can be considered as negative statuses because they mean that the users are not able to make the loan payment and defaulted their loan.
+
+```{r, Loan Date, echo=FALSE, message=FALSE , warning=FALSE}
+#Convert date into lubridate type, so that we can parse the date and month level
+loan$LoanDate <- ymd_hms(loan$LoanOriginationDate)
+loan$LoanMonth <- factor(month(loan$LoanDate))
+loan$LoanYear <- factor(year(loan$LoanDate))
+
+LoanByYear <- loan %>%
+  group_by(LoanYear) %>%
+  summarise(LoanTotalSum=sum(LoanOriginalAmount),LoanTotalAvg=mean(LoanOriginalAmount), LoanCount=n()) %>%
+  arrange(desc(LoanYear))
+
+LoanByMonth <- loan %>%
+  group_by(LoanMonth) %>%
+  summarise(LoanTotalSum=sum(LoanOriginalAmount),LoanTotalAvg=mean(LoanOriginalAmount), LoanCount=n()) %>%
+  arrange(desc(LoanMonth))
+
+multi.fun(loan$LoanYear)
+multi.fun(loan$LoanMonth)
+
+LoanByYear
+LoanByMonth
+
+ggplot(data=loan, aes(x= LoanMonth)) +
+  geom_bar(fill='#05DBF2', 
+           color='black') +
+  geom_text(stat='count',size= 3, aes(label=..count..),vjust=-0.5)+
+  labs(title = "Number of loans by Month",
+       x= "Loan Month",
+       y= "Number of loans") +
+  theme(axis.text.x = element_text(hjust = 1))
+
+ggplot(data=loan, aes(x= factor(LoanMonth), y=LoanOriginalAmount)) +
+  stat_summary(fun.y="sum", geom="bar") +
+  stat_summary(aes(label=round(..y..,2)), fun.y=sum, geom="text", size=2,vjust=-0.5)+
+  labs(title = "Sum of loan amount by month",
+       x= "Loan Month",
+       y= "Sum of loan amount")
+
+ggplot(data=loan, aes(x= factor(LoanMonth), y=LoanOriginalAmount)) +
+  stat_summary(fun.y="mean", geom="bar") +
+  stat_summary(aes(label=round(..y..,2)), fun.y=mean, geom="text", size=2,vjust=-0.5)+
+  labs(title = "Average loan amount by month",
+       x= "Loan Month",
+       y= "Average loan amount")
+
+ggplot(data=loan, aes(x= LoanYear)) +
+  geom_bar(fill='#05DBF2', 
+           color='black') +
+  geom_text(stat='count',size= 3, aes(label=..count..),vjust=-0.5)+
+  labs(title = "Number of loans by year",
+       x= "Loan Year",
+       y= "Number of loans") +
+  theme(axis.text.x = element_text(hjust = 1))
+
+ggplot(data=loan, aes(x= factor(LoanYear), y=LoanOriginalAmount)) +
+  stat_summary(fun.y="sum", geom="bar") +
+  stat_summary(aes(label=round(..y..,2)), fun.y=sum, geom="text", size=2,vjust=-0.5)+
+  labs(title = "Sum of loan amount by year",
+       x= "Loan Year",
+       y= "Sum of loan amount")
+
+ggplot(data=loan, aes(x= factor(LoanYear), y=LoanOriginalAmount)) +
+  stat_summary(fun.y="mean", geom="bar") +
+  stat_summary(aes(label=round(..y..,2)), fun.y=mean, geom="text", size=2,vjust=-0.5)+
+  labs(title = "Average loan amount by year",
+       x= "Loan Year",
+       y= "average loan amount")
+```
+From the graphs and tables above, we can see a very different trend between comparison of average and frequency or sum of loan amount by month or year.
+
+For loan amount by month:
+- Both sum and average of loan amount show similar months in which there are some peaks. However, if we rank it by the measures (either average or sum or freq), the top months will be different:
+    1) For average loan amount: Jan, Feb, Oct, Nov, Dec have the most average loan amount (ordered from top to bottom). The average loan is generally lower in the month of April to August. 
+    2) For sum or frequency of loan amount: Jan, Oct, Dec, Feb, Nov have the most average loan amount (ordered by top to bottom). There is an obvious dip in sum and frequency of loan amount in April.
+    
+For loan amount by year:
+    1) Generally, the average loan amount is increasing throughout the years, only with some dips in 2008 to 2010.
+    2) The sum of loan amount peaks in 2013, with similar dips observed in 2008 to 2010.
+    Perhaps, those dips are caused by financial crisis?
+
+```{r, Loan Original Amount, echo=FALSE, message=FALSE , warning=FALSE}
+ggplot(data=loan, aes(x=EmploymentStatusDuration)) +geom_bar(binwidth=1)
+summary(loan$EmploymentStatusDuration)
+```
+
+EmploymentStatusDuration shows a right-skewed distribution with mean (96 months) > median (67 months). This shows that the employment status of users are more likely to stay unchanged in a shorter duration.
+
+```{r, ListingCategory, echo=FALSE, message=FALSE}
+
+loan$ListingCategory..numeric. <- factor(loan$ListingCategory..numeric.)
+
+loanCategories_key <- c('0', '1', 
+          '2', '3', '4', 
+          '5', '6', '7', '8', 
+          '9', '10', '11', 
+          '12', '13', 
+          '14', '15', '16',
+          '17', '18', '19', '20')
+
+loanCategories_val <- c('0 - Not Available', '1 - Debt Consolidation', 
+          '2 - Home Improvement', '3 - Business', '4 - Personal Loan', 
+          '5 - Student Use', '6 - Auto', '7- Other', '8 - Baby&Adoption', 
+          '9 - Boat', '10 - Cosmetic Procedure', '11 - Engagement Ring', 
+          '12 - Green Loans', '13 - Household Expenses', 
+          '14 - Large Purchases', '15 - Medical/Dental', '16 - Motorcycle',
+          '17 - RV', '18 - Taxes', '19 - Vacation', '20 - Wedding Loans')
+
+library(plyr)
+loan$listingCategory <- mapvalues(loan$ListingCategory..numeric., from = loanCategories_key, to = loanCategories_val)
+length(loan$listingCategory)
+
+ggplot(data=loan,aes(x=reorder_size(listingCategory)))+
+  geom_bar() + scale_fill_discrete(name="Loan Category", labels=loanCategories_val)+
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+ggplot(data=loan, aes(x= reorder(listingCategory,-LoanOriginalAmount,sum), y=LoanOriginalAmount)) +
+  stat_summary(fun.y="sum", geom="bar") +
+  stat_summary(aes(label=round(..y..,2)), fun.y=sum, geom="text", size=2,vjust=-0.5)+
+  labs(title = "Sum of loan amount by listing category",
+       x= "Listing Category",
+       y= "Sum of loan amount")+
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+ggplot(data=loan, aes(x= reorder(listingCategory,-LoanOriginalAmount,mean), y=LoanOriginalAmount)) +
+  stat_summary(fun.y="mean", geom="bar") +
+  stat_summary(aes(label=round(..y..,2)), fun.y=mean, geom="text", size=2,vjust=-0.5)+
+  labs(title = "Average of loan amount by listing category",
+       x= "Listing Category",
+       y= "Average of loan amount")+
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+
+detach("package:plyr", unload=TRUE) 
+LoansbySumDollar <- loan %>%
+  group_by(listingCategory) %>%
+  summarise(SumDollarTotal=sum(LoanOriginalAmount), CountTotal=n()) %>%
+  arrange(desc(SumDollarTotal, CountTotal))
+
+LoansbyAvgDollar <- loan %>%
+  group_by(listingCategory) %>%
+  summarise(AvgDollarTotal=mean(LoanOriginalAmount), CountTotal=n()) %>%
+  arrange(desc(AvgDollarTotal, CountTotal))
+
+#print
+LoansbySumDollar
+LoansbyAvgDollar
+multi.fun(reorder_size(loan$listingCategory))
+```
+Based on the results shown above, if we look at the bar chart showing the frequency of listing categories, we can observe that around 51% of the listing categories are of Debt Consolidation. Therefore, it does not really tell us much insight as debt consolidation is a very generic term for loan repayment.
+
+As such, by observing the listing category by average loan amount, we can observe some interesting insights. The top 10 listing categories are: Debt Consolidation, Baby&Adoption, Business, Wedding Loans, Large Purchases, Boat, Green Loans, RV, Home Improvement, Engagement Ring.
+
+Some interesting observations:
+- Marriage seems to play a huge role in loan: Baby&Adoption, Wedding Loans, Engagement Ring
+- Home improvement has a higher frequency than Business.
+- Beyond the top 10, Household Expenses, Auto, Vacation, Medical/Dental have significant frequency number as well.
+
+Combining all the three points above, we can see that most of the users are willing to take loan in category such as family, wedding, housing, health, business, and lifestyle.
+
+```{r, Debt to Income Ratio}
+ggplot(aes(x=DebtToIncomeRatio), data=loan) + 
+    geom_histogram(fill='#05DBF2', 
+                   color='black', 
+                   binwidth=0.05) +
+    scale_x_continuous(breaks=seq(0,2,0.1),limits=c(0,2)) +
+    labs(title="Debt to Income Ratio",
+         x='Debt to Income Ratio')
+```
+From the histogram above, we can see that most of the users have debt that is around 10% to 30% of their income. It makes me wonder who will take loan which is 50% or more above their income? Maybe, this is worth investigating in the multivariate analysis in later part of the project.
+
+the next step is to estimate the monthly debt by multplying the debt to income ratio with the stated monthly income.
+```{r,   Monthly Debt, echo=FALSE, message=FALSE , warning=FALSE}
+#Total monthly = DI Ratio * StatedMonthlyIncome
+
+loan$TotalMonthlyDebt<- loan$DebtToIncomeRatio * loan$StatedMonthlyIncome
+
+ggplot(aes(x=TotalMonthlyDebt), data=loan) + 
+    geom_histogram(fill='#05DBF2', 
+                   color='black', 
+                   binwidth=100) +
+    scale_x_continuous(breaks=seq(0,4000,500),limits=c(0,4000)) +
+    labs(title="Monthly Debt",
+         x='Monthly Debt')
+
+summary(loan$TotalMonthlyDebt)
+```
+From the distribution of monthly debt above, it can be seen that most of the users have monthly debt around 300 to 1500. This is in line with the debt-to-income ratio, which is around 10% to 30% of the monthly income (around \$3000 to \$6000) for most of the users.
+
+```{r, Borrower Interest Rate, echo=FALSE, message=FALSE , warning=FALSE}
+str(loan$BorrowerRate)
+typeof(loan$BorrowerRate)
+class(loan$BorrowerRate)
+ggplot(data=loan, aes(x=BorrowerRate)) +geom_bar(binwidth=.01)
+
+ggplot(aes(x=BorrowerRate), data=loan) + 
+    geom_histogram(fill='#05DBF2', 
+                   color='black', 
+                   binwidth=0.005) +
+    scale_x_continuous(breaks=seq(0,0.4,0.05),limits=c(0,0.4)) +
+    labs(title="Borrower Rate",
+         x='Borrower Rate')
+```
+The distribution of borrower rate is somewhat bell-curve like with slightly right-skewed trend and some intermittent spikes throughout the trend. There is a very obvious mega spike at around 31%. After some online research (http://www.lendingmemo.com/rates-fees-lending-club-prosper/),we can understand that users with 31% borrower rate usually falls within Prosper credit rating of E or HR.
+
+
+```{r, Prosper Credit Rating, echo=FALSE, message=FALSE , warning=FALSE}
+multi.fun(reorder_size(loan$ProsperRating..Alpha.))
+ggplot(data=loan, aes(x= ProsperRating..Alpha.)) +
+  geom_bar(fill='#05DBF2', 
+           color='black') +
+  geom_text(stat='count',size= 3, aes(label=..count..),vjust=-0.5)+
+  labs(title = "Prosper Credit Rating",
+       x= "Prosper Credit Rating") +
+  theme(axis.text.x = element_text(hjust = 1))
+```
+Around 25% of the loans are not rated, while the rest of the ratings are almost similar at around 15%, except for the smaller proportion of AA, E, and HR rating.
+
+```{r, Borrower Rate vs Credit Rating, echo=FALSE, message=FALSE , warning=FALSE }
+ggplot(data=loan, aes(x=ProsperRating..Alpha.,y=BorrowerRate, color=ProsperRating..Alpha.))+
+  geom_boxplot() +
+  labs(title = "Borrower Rate vs Credit Rating",
+       x= "Borrower Rate", y = "Prosper Credit Rating") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+```
+From the boxplot above, we cannot really see any relationship between borrower rate and Prosper Credit Rating. Perhaps, the source (http://www.lendingmemo.com/rates-fees-lending-club-prosper/) mentioned are not really credible? The Borrower Rate seems to be an interesting area to explore in multivariate analysis.
+
+```{r, Credit Score Range Lower, echo=FALSE, message=FALSE , warning=FALSE}
+
+summary(loan$CreditScoreRangeLower)
+class(loan$CreditScoreRangeLower)
+summary(loan$CreditScoreRangeLower)
+head(loan$CreditScoreRangeLower,20)
+multi.fun(loan$CreditScoreRangeLower)
+
+ggplot(data=loan, aes(x= factor(CreditScoreRangeLower))) +
+  geom_bar(fill='#05DBF2', 
+           color='black') +
+  labs(title = "Credit Score Range Lower",
+       x= "Credit Score Range Lower") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+```
+After summarizing CreditScoreRangeLower in frequency table, we can see that the variable is more appropriate to be converted as a discrete variable. As such, a bar chart is chosen over a histogram.
+
+From the bar chart of credit score range lower, we can see that the most common credit score is between 640 to 740.
+
+What if we analyze both borrower rate and credit score range lower together? Is there any relationship between them?
+
+```{r, Borrower Rate vs Credit Score Range Lower, echo=FALSE, message=FALSE , warning=FALSE }
+ggplot(data=loan, aes(x=factor(CreditScoreRangeLower),y=BorrowerRate, color=factor(CreditScoreRangeLower)))+
+  geom_boxplot() +
+  labs(title = "Borrower Rate vs Credit Score Range Lower",
+       x= "Borrower Rate", y = "Credit Score Range Lower") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+```
+Now, we can see that borrower rate goes lower as the credit score goes higher. This means that users with higher credit score are usually perceived as more credible, and as such, may be more likely to be given a lower borrower rate. 
+
+
+```{r, Credit Lines, echo=FALSE, message=FALSE , warning=FALSE}
+ggplot(data=loan, aes(x=CurrentCreditLines)) +geom_histogram(fill='#05DBF2', color='black', binwidth=1)
+
+ggplot(aes(x=CurrentCreditLines), data=loan) + 
+    geom_histogram(fill='#05DBF2', 
+                   color='black', 
+                   binwidth=1) +
+    scale_x_continuous(breaks=seq(0,40,2),limits=c(0,40)) +
+    labs(title="Current Credit Lines",
+         x='Current Credit Lines')
+
+```
+Most of the users have around 3 to 15 current credit lines with the median around 6 to 8 credit lines. 
+
+```{r, Borrower States, echo=FALSE, message=FALSE , warning=FALSE}
+topStates <- loan  %>% group_by(BorrowerState)  %>% summarise(count=n()) %>%
+  arrange(desc(count)) %>% top_n(5)
+
+ggplot(data=topStates, aes(reorder(x=BorrowerState,-count), y=count)) +
+  geom_bar(stat='identity',
+           fill='#05DBF2', 
+           color='black') +
+  labs(title = "Borrower State",
+       x= "BorrowerState") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+```
+
+The top borrower states are California, Texas, New York, Florida, and Illinois
+```{r, Employment & Homeowner, echo=FALSE, message=FALSE , warning=FALSE}
+ggplot(data=subset(loan, loan$EmploymentStatus!=""), 
+       aes(reorder_size(x=EmploymentStatus))) +
+  geom_bar(fill='#05DBF2', 
+           color='black') +
+  labs(title = "Employment Status",
+       x= "Employment Status") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+```
+
+
