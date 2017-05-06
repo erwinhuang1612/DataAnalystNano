@@ -36,7 +36,7 @@ library(gridExtra)
 ```
 
 ### Prosper Peer-to-peer Lending Platform Dataset
-![Prosper Peer-to-peer Lending Platform](https://cdn6.ijstatic.com/wp-content/uploads/2016/02/prosper.png)
+![Prosper Peer-to-peer Lending Platform](http://mms.businesswire.com/media/20160314005400/en/512432/5/Prosper_NewLogo_300x150.jpg)
 
 This dataset contains a list of loans of [Prosper Peer-to-peer Lending Platform](https://www.prosper.com/) from 2005 to 2016 with 81 variables in total. I have chosen this dataset because it contains various variables related to peer to peer lending that can be explored to understand the basic purpose of getting P2P loan, overall customer behaviour in the P2P platform.
 ```{r, Load Dataset, echo=FALSE, message = FALSE, warning=FALSE}
@@ -286,9 +286,6 @@ LoanByMonth <- loan %>%
 multi.fun(loan$LoanYear)
 multi.fun(loan$LoanMonth)
 
-LoanByYear
-LoanByMonth
-
 ggplot(data=loan, aes(x= LoanMonth)) +
   geom_bar(fill='#05DBF2', 
            color='black') +
@@ -303,14 +300,14 @@ ggplot(data=loan, aes(x= factor(LoanMonth), y=LoanOriginalAmount)) +
   stat_summary(aes(label=round(..y..,2)), fun.y=sum, geom="text", size=2,vjust=-0.5)+
   labs(title = "Sum of loan amount by month",
        x= "Loan Month",
-       y= "Sum of loan amount")
+       y= "Sum of loan amount ($)")
 
 ggplot(data=loan, aes(x= factor(LoanMonth), y=LoanOriginalAmount)) +
   stat_summary(fun.y="mean", geom="bar") +
   stat_summary(aes(label=round(..y..,2)), fun.y=mean, geom="text", size=2,vjust=-0.5)+
   labs(title = "Average loan amount by month",
        x= "Loan Month",
-       y= "Average loan amount")
+       y= "Average loan amount ($)")
 
 ggplot(data=loan, aes(x= LoanYear)) +
   geom_bar(fill='#05DBF2', 
@@ -326,14 +323,14 @@ ggplot(data=loan, aes(x= factor(LoanYear), y=LoanOriginalAmount)) +
   stat_summary(aes(label=round(..y..,2)), fun.y=sum, geom="text", size=2,vjust=-0.5)+
   labs(title = "Sum of loan amount by year",
        x= "Loan Year",
-       y= "Sum of loan amount")
+       y= "Sum of loan amount ($)")
 
 ggplot(data=loan, aes(x= factor(LoanYear), y=LoanOriginalAmount)) +
   stat_summary(fun.y="mean", geom="bar") +
   stat_summary(aes(label=round(..y..,2)), fun.y=mean, geom="text", size=2,vjust=-0.5)+
   labs(title = "Average loan amount by year",
        x= "Loan Year",
-       y= "average loan amount")
+       y= "Average loan amount ($)")
 ```
 
 From the graphs and tables above, we can see a very different trend between comparison of average and frequency or sum of loan amount by month or year.
@@ -353,7 +350,7 @@ ggplot(data=loan, aes(x=EmploymentStatusDuration)) +
     geom_bar(fill='#05DBF2'
            ) +
     labs(title = "Employment Status Duration",
-       x= "Employment Status Duration")
+       x= "Employment Status Duration (months)")
 summary(loan$EmploymentStatusDuration)
 ```
 
@@ -404,7 +401,7 @@ ggplot(data=loan, aes(x= reorder(listingCategory,-LoanOriginalAmount,sum), y=Loa
   stat_summary(aes(label=round(..y..,2)), fun.y=sum, geom="text", size=2,vjust=-0.5)+
   labs(title = "Sum of loan amount by listing category",
        x= "Listing Category",
-       y= "Sum of loan amount")+
+       y= "Sum of loan amount ($)")+
   theme(axis.text.x = element_text(angle = 60, hjust = 1))
 
 ggplot(data=loan, aes(x= reorder(listingCategory,-LoanOriginalAmount,mean), y=LoanOriginalAmount)) +
@@ -412,7 +409,7 @@ ggplot(data=loan, aes(x= reorder(listingCategory,-LoanOriginalAmount,mean), y=Lo
   stat_summary(aes(label=round(..y..,2)), fun.y=mean, geom="text", size=2,vjust=-0.5)+
   labs(title = "Average of loan amount by listing category",
        x= "Listing Category",
-       y= "Average of loan amount")+
+       y= "Average of loan amount ($)")+
   theme(axis.text.x = element_text(angle = 60, hjust = 1))
 
 
@@ -812,7 +809,7 @@ ggplot(data=loan, aes(x=LoanOriginalAmount, y=BorrowerRate)) +
   geom_point(alpha=0.1, size= 1, position='jitter') +
   geom_smooth(method='lm')+
   labs(title = "Loan Original Amount vs Borrower Rate",
-       x= "Loan Original Amount",
+       x= "Loan Amount ($)",
        y= "Borrower Rate")
 
 cor(loan$LoanOriginalAmount,loan$BorrowerRate,"pairwise.complete.obs")
@@ -897,7 +894,7 @@ ggplot(data=loan, aes(x=BorrowerRate)) +
   geom_histogram(binwidth=0.01) + 
   scale_x_continuous(breaks=seq(0.3,0.35,0.01),limits=c(0.3,0.35)) +
   facet_wrap(~listingCategory) +
-  scale_fill_discrete(name="Loan Category", labels=listingCategory) + 
+  scale_fill_discrete(name="Loan Category") + 
   labs(title="Count of Borrower Rate by Listing Category",
          x='Borrower Rate')
 ```
@@ -945,7 +942,7 @@ ggplot(data=loan, aes(x=LoanYear, y=LoanOriginalAmount)) +
   geom_bar(stat='identity') +
   labs(title="Sum of Loan Amount by Loan Year",
      x='Loan Year',
-     y='Sum of Loan Original Amount')
+     y='Sum of Loan Original Amount ($)')
 ```
 
 When we sum up the loan amount by loan year, it tells a slightly different story. In 2009, there is a similar dip of loan amount followed by a steady increase of sum of loan amount. However, in 2014, we can see a significant decrease in the sum of loan amount, which is not clearly depicted in the previous box plot of loan amount by loan year.
@@ -963,7 +960,7 @@ ggplot(data=loan, aes(x=LoanDate, y=LoanOriginalAmount)) +
   scale_x_datetime(labels = date_format("%Y-%m"), date_breaks = "2 month") +
   labs(title="Loan amount by Loan Date",
      x='Loan Date',
-     y='Loan amount') +
+     y='Loan amount ($)') +
   theme(axis.text.x = element_text(angle = 60, hjust = 1))
 ```
 
@@ -974,7 +971,7 @@ ggplot(data=loan, aes(x=LoanMonth,y=LoanOriginalAmount))+
   geom_boxplot() +
   labs(title="Loan amount by Loan Month",
      x='Loan Month',
-     y='Loan amount')+
+     y='Loan amount ($)')+
   stat_summary(fun.y = "mean", 
                geom = "point", 
                color = "red", 
@@ -985,15 +982,15 @@ ggplot(data=loan, aes(x=LoanMonth,y=LoanOriginalAmount))+
 The chart above shows a very obvious seasonality trend, in which the peak of median loan amount is at the holiday season (November to December) and beginning of the year (January, February).
 
 ```{r, Loan Listing Category and Loan Amount, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 8, fig.height = 10,}
-ggplot(data=loan, 
+ggplot(data=loan,
        aes(x=reorder(listingCategory,-LoanOriginalAmount,median),
            y=LoanOriginalAmount)) + 
       geom_boxplot() + 
-      scale_fill_discrete(name="Loan Listing Category", labels=listingCategory)+
+      scale_fill_discrete(name="Loan Listing Category")+
       theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
       labs(title="Loan amount by Loan Month",
       x='Loan Month',
-      y='Loan amount')+
+      y='Loan amount ($)')+
   stat_summary(fun.y = "mean", 
                geom = "point", 
                color = "red", 
@@ -1020,7 +1017,7 @@ ggplot(data=subset(loan, loan$EmploymentStatus!=""),
       theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
       labs(title="Loan amount by Employment Status",
       x='Employment Status',
-      y='Loan amount')+
+      y='Loan amount ($)')+
   stat_summary(fun.y = "mean", 
                geom = "point", 
                color = "red", 
@@ -1037,7 +1034,7 @@ ggplot(data=loan, aes(x=factor(Term), y=LoanOriginalAmount)) +
   geom_boxplot() +
   labs(title="Loan amount by Loan Term",
   x='Loan Term',
-  y='Loan amount')+
+  y='Loan amount ($)')+
   stat_summary(fun.y = "mean", 
                geom = "point", 
                color = "red", 
@@ -1121,7 +1118,7 @@ ggplot(data=subset(loan, loan$CreditScoreRangeLower > 650),
   geom_point(alpha=0.6, position='jitter') + 
   scale_colour_gradient(low="black", high="red") +
   labs(title="Loan Amount by Borrower Rate and Credit Score",
-  x='Stated Monthly Income',
+  x='Stated Monthly Income ($)',
   y='Borrower Rate')
 
 ggplot(data=subset(loan, loan$CreditScoreRangeLower > 650 & loan$StatedMonthlyIncome < 50000), 
@@ -1129,7 +1126,7 @@ ggplot(data=subset(loan, loan$CreditScoreRangeLower > 650 & loan$StatedMonthlyIn
   geom_point(alpha=0.6, position='jitter') + 
   scale_colour_gradient(low="black", high="red") +
   labs(title="Monthly Income by Borrower Rate and Loan Amount",
-  x='Stated Monthly Income',
+  x='Stated Monthly Income ($)',
   y='Borrower Rate')
 ```
 
@@ -1249,7 +1246,7 @@ box1 <- ggplot(data=loan, aes(x=LoanYear,y=LoanOriginalAmount)) +
   geom_boxplot() +
   labs(title="Loan Amount by Loan Year",
   x='Loan Year',
-  y='Loan Amount')+
+  y='Loan Amount ($)')+
   stat_summary(fun.y = "mean", 
                geom = "point", 
                color = "red", 
@@ -1260,7 +1257,7 @@ box2 <- ggplot(data=loan, aes(x=LoanYear,y=sum(LoanOriginalAmount))) +
   geom_bar(stat = "identity") +
   labs(title="Sum of Loan Amount by Loan Year",
   x='Loan Year',
-  y='Sum of Loan Amount')
+  y='Sum of Loan Amount ($)')
 
 grid.arrange(box1,box2,ncol=2)
 ```
@@ -1322,7 +1319,7 @@ From the figures above, we can see that the overall risk of running the business
 
 ### Plot Three
 ```{r, loan amount by loan category and year, echo=FALSE, warning=FALSE, message=FALSE, fig.width = 13, fig.height = 6}
-loan$listingCategory <- listingCategory
+# loan$listingCategory <- listingCategory
 loanByYear <- loan %>%
   group_by(LoanYear,listingCategory, IncomeRange) %>%
     summarise(DollarTotal=sum(LoanOriginalAmount), CountTotal=n()) %>%
@@ -1332,9 +1329,9 @@ loanByYear <- loan %>%
 ggplot(data=loanByYear, aes(x=LoanYear, y=DollarTotal/1000000)) +
   geom_bar(stat='identity') +
   facet_wrap(~listingCategory) +
-  scale_fill_discrete(name="Loan Listing CategoryCategory", labels=cats) +
+  scale_fill_discrete(name="Loan Listing CategoryCategory") +
   ggtitle("Loan Amount by Loan Listing Category and Year") + 
-  ylab("Loan Amount") + 
+  ylab("Loan Amount ($)") + 
   xlab("Year") +
   theme(axis.text.x = element_text(angle=45, vjust=1, size=7))
 ```
