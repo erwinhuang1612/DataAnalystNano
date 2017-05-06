@@ -1,5 +1,5 @@
 ---
-title: "Udacity Data Analysis With R Final_Project"
+title: "Udacity: Data Analysis With R Final Project"
 author: "Erwin"
 date: "6 May 2017"
 output:
@@ -36,7 +36,7 @@ library(gridExtra)
 ```
 
 ### Prosper Peer-to-peer Lending Platform Dataset
-![Prosper Peer-to-peer Lending Platform](http://mms.businesswire.com/media/20160314005400/en/512432/5/Prosper_NewLogo_300x150.jpg)
+![ ](http://mms.businesswire.com/media/20160314005400/en/512432/5/Prosper_NewLogo_300x150.jpg)
 
 This dataset contains a list of loans of [Prosper Peer-to-peer Lending Platform](https://www.prosper.com/) from 2005 to 2016 with 81 variables in total. I have chosen this dataset because it contains various variables related to peer to peer lending that can be explored to understand the basic purpose of getting P2P loan, overall customer behaviour in the P2P platform.
 ```{r, Load Dataset, echo=FALSE, message = FALSE, warning=FALSE}
@@ -752,7 +752,7 @@ ggplot(data=loan, aes(x=CurrentCreditLines, y=TotalMonthlyDebt)) +
   geom_smooth(method='lm')+
   labs(title = "Current Credit Lines vs Total Monthly Debt",
        x= "Current Credit Lines",
-       y= "Total Monthly Debt")
+       y= "Total Monthly Debt ($)")
 
 cor(df$TotalMonthlyDebt,df$CurrentCreditLines,"pairwise.complete.obs")
 ```
@@ -796,7 +796,7 @@ ggplot(data=loan, aes(x=StatedMonthlyIncome, y=TotalMonthlyDebt )) +
   ylim(0, 7000) +
   geom_smooth(method='lm')+
   labs(title = "Stated Monthly Income vs Total Monthly Debt",
-       x= "Stated Monthly Income",
+       x= "Stated Monthly Income ($)",
        y= "Total Monthly Debt")
 
 cor(df$StatedMonthlyIncome,df$TotalMonthlyDebt,"pairwise.complete.obs")
@@ -952,7 +952,7 @@ class(loan$LoanOriginationDate)
 loan$MonthYear <- as.Date(loan$LoanOriginationDate, format = "%d/%m/%Y")
 summary(loan$MonthYear)
 summary(as.Date(loan$LoanDate))
-ggplot(data=loan, aes(x=as.Date(LoanDate), y=LoanOriginalAmount)) + geom_bar(stat='identity')
+# ggplot(data=loan, aes(x=as.Date(LoanDate), y=LoanOriginalAmount)) + geom_bar(stat='identity')
 
 library(scales)
 ggplot(data=loan, aes(x=LoanDate, y=LoanOriginalAmount)) + 
@@ -1172,7 +1172,10 @@ YearlyIncomeAndLoan <- loan %>%
 ggplot(data=subset(YearlyIncomeAndLoan, YearlyIncomeAndLoan$IncomeRange_reordered != '$0'),
        aes(x=LoanYear, y=LoanTotal, fill=IncomeRange_reordered)) + 
   geom_bar(stat='identity') + scale_fill_discrete(name="Income Range") +
-  ggtitle("Loan Amount by Year Faceted by Income Range") + facet_wrap(~IncomeRange_reordered) + 
+  labs(title="Loan Amount by Year Faceted by Income Range",
+  x='Year ',
+  y='Sum of Loan Amount ($)')+
+  facet_wrap(~IncomeRange_reordered) + 
   theme(axis.text.x = element_text(angle=45, vjust=1, size=7))
 
 ```
