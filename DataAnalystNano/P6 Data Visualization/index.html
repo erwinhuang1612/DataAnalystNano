@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Out-Of-School</title>
+
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- CSS Global Compulsory -->
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+
+    <!-- CSS Customization -->
+    <link rel="stylesheet" type="text/css" href="css/custom.css">
+
+</head> 
+
+<body>
+<div class="container">
+
+    <!-- storyheader -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="storyHeader">
+                <h6 class="dateline">
+                    September 15, 2018
+                </h6>
+                <h1>How Important Is The Time Spent Studying Out of School</h1>
+            </div>
+        </div>
+    </div><!--close storyHeader -->
+
+
+    <div class="row">
+        <div class="col-md-12">
+
+            <div id="my-wrapper" class="ink">
+                <!-- navigator -->
+                <div class="my-stepper-wrapper">
+                    <div id="my-stepper">
+                        <div class="ink-basicStepper clearfix">
+                            <a href="#" class="ink-stepperButton ink-previous ink-disabled">Prev</a>
+                            <a href="#" class="ink-stepperButton ink-next">Next</a>
+                            <ul class="ink-steps">
+                                <!--<li class="ink-step ink-selected" data-index="0" id = "data_0"><a href="#">1</a></li>-->
+                                <li class="ink-step ink-selected" data-index="1" id = "data_1"><a href="#">1</a></li>
+                                <li class="ink-step" data-index="2" id = "data_2"><a href="#">2</a></li>
+                                <li class="ink-step" data-index="3" id = "data_3"><a href="#">3</a></li>
+                                <li class="ink-step ink-last" data-index="4" id = "data_4"><a href="#">4</a></li>
+                                <li class="ink-step " data-index="5" id = "data_5"><a href="#">5</a></li>                                
+                            </ul>
+                        </div>
+                    </div>
+                </div><!--close navigator -->
+
+                
+                <div class="my-canvas-wrap">
+                    <!--  udacity hours chart -->
+                    <div class="row" id="FirstChart" style="display:none;">
+                        <div class="col-md-12 my-canvas">                    
+<!--                             <div class="my-canvas-legend">
+                                Hours 
+                                <div class="my-canvas-tiny-legend">
+                                    per week
+                                </div>
+                            </div> -->
+
+                            <!-- <div class="my-explainer"> -->
+                            <div class="my-expl3">
+                                <div class="my-title" id="firstTitle"></div>
+                                <div class="my-description" id="firstTxt"></div>
+                            </div>
+
+                            <div id = "UdacityBars"></div>
+
+                            <div class="my-canvas-legend my-canvas-legend-bottom">
+                                Weeks
+                            </div>
+                        </div>
+                    </div><!-- close udacity hours chart -->
+
+                    <!-- Show OCDE dashboard -->
+                    <div class="row" id="SecondChart" style="display:none;">
+                        <div class="row">
+                            <!-- Boxplot -->
+                            <div class="col-md-8 my-canvas">
+                                <div class="my-expl3">
+                                    <div class="my-title" id="otherTitle"></div>
+                                    <div class="my-description" id="otherTxt"></div>
+                                </div>
+                                <div id = "BoxPlot"></div>
+
+                                
+                                <div class="my-canvas-legend my-canvas-legend-bottom">
+                                    Hours per Week
+                                </div>
+                            </div><!-- close Boxplot -->
+
+
+                            <div class="col-md-4 my-canvas"> 
+                                <!-- barchart -->
+                                <div class="row">
+
+                                    <div class="col-md-12 my-canvas">
+                                        <div class="my-expl3">
+                                            <div class="my-title">Number of Students</div>
+                                            <div class="my-description">by Social Status Index</div>
+                                        </div>
+                                        <div id = "SocialBars"></div>                                      
+                                    </div>
+                                </div><!-- close barchart -->
+
+                                <!-- scatter -->
+                                <div class="row">
+                                    <div class="col-md-12 my-canvas">
+                                        <div class="my-expl3">
+                                            <div class="my-title">Average Math Scores by Country</div>
+                                            <div class="my-description">vs. Out of School Study Time</div>
+                                        </div>
+                                        <div id = "Scatter"></div> 
+
+                                    </div>
+                                </div> <!--close scatter -->
+
+
+                            </div>
+
+                        </div>
+                    </div><!--close OCDE dashboard -->
+                </div> <!-- close my-canvas-wrap -->
+
+            </div><!-- close my-wrapper -->
+        </div>
+    </div>
+
+</div><!--close container -->
+
+
+<!-- footer -->
+<footer class="footer">
+    <div class="container">
+		
+        <div class="insetHFullWidth">
+            <div id="interactiveFooter">
+                <div class="metaData element1">
+                    <div class="module">
+                        <span class="text-muted byline">
+                        </span>
+                    </div>
+                    <div class="module">
+                        <p class="credit">
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>   
+    </div>
+</footer><!--close footer -->
+
+
+<!-- JS Global Compulsory -->           
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery-migrate.min.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script> 
+<script type="text/javascript" src="js/d3.v3.min.js"></script>
+
+<!-- Charts -->
+<script type="text/javascript" src="js/udacity_hours.js"></script>
+<script type="text/javascript" src="js/ocde.js"></script>
+<script type="text/javascript" src="js/box.js"></script>
+ 
+
+<script type="text/javascript">
+    //draw udacity chart
+    displayUdacity("hide");
+
+    //draw others
+    draw_ocde()
+
+</script>
+
+
+
+
+</body>
+</html> 
+
+
+<!-- <div class="my-popup" style="top: -60px; left: 535.5px; display: none;">
+
+    <div class="my-popup-label">1999</div>
+    <div class="my-popup-title">WEBVAN GROUP </div>
+    <div class="my-popup-line">
+        <span class="my-popup-label">Value at I.P.O.</span>
+        <span class="my-popup-value">$6.5 billion</span>
+    </div>
+    <table>
+        <tbody>
+            <tr>
+                <td class="row1">+66%</td>
+                <td class="row1 col2">−100%</td>
+            </tr>
+            <tr>
+                <td class="row2">First day<br>change</td>
+                <td class="row2 col2">Three years<br>later</td>
+            </tr>
+        </tbody>
+    </table>
+</div> -->
